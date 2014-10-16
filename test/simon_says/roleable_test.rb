@@ -10,6 +10,10 @@ class RoleableTest < ActiveSupport::TestCase
     @klass = Class.new(ActiveRecord::Base) do
       self.table_name = 'test_widgets'
 
+      def self.name
+        'User'
+      end
+
       include SimonSays::Roleable
 
       has_roles :read, :write
@@ -17,6 +21,10 @@ class RoleableTest < ActiveSupport::TestCase
 
     @as_klass = Class.new(ActiveRecord::Base) do
       self.table_name = 'test_widgets'
+
+      def self.name
+        'Admin'
+      end
 
       include SimonSays::Roleable
 
@@ -180,5 +188,13 @@ class RoleableTest < ActiveSupport::TestCase
       @as_klass.with_access(:editor).count,
       @as_klass.with_access(:support).count,
     ]
+  end
+
+  test "User is added to registry" do
+    assert_includes SimonSays::Roleable.registry, 'User'
+  end
+
+  test "Admin is added to registry" do
+    assert_includes SimonSays::Roleable.registry, 'Admin'
   end
 end

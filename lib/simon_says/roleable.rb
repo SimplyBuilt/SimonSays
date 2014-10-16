@@ -2,6 +2,11 @@ module SimonSays
   module Roleable
     extend ActiveSupport::Concern
 
+    def self.registry
+      # "global" registry we'll use when authorizing
+      @registry ||= {}
+    end
+
     module ClassMethods
       ##
       # Provides a declarative method to introduce role based
@@ -25,6 +30,8 @@ module SimonSays
         name = (options[:as] || :roles).to_s
         singular = name.singularize
         const = name.upcase
+
+        Roleable.registry[model_name.to_s] ||= name
 
         roles.map!(&:to_sym)
 
