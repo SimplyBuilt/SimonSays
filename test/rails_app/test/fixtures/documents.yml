@@ -1,3 +1,8 @@
-alpha: {}
-beta: {}
-gamma: {}
+alpha:
+  title: Alpha
+
+beta:
+  title: Beta
+
+gamma:
+  title: Gamma

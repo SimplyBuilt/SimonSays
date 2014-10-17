@@ -4,5 +4,5 @@ class Membership < ActiveRecord::Base
   belongs_to :user
   belongs_to :document
 
-  has_roles :download, :fork, :update, :delete
+  has_roles :download, :fork, :edit, :delete
 end

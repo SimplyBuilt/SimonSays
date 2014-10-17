@@ -60,11 +60,11 @@ class AuthorizerTest < ActiveSupport::TestCase
 
   test "find_resource with namespace" do
     @controller.current_admin = admins(:support)
-    @controller.params = { id: admin_reports(:support_report).id }
+    @controller.params = { id: admin_reports(:report_one).id }
 
     @controller.find_resource :report, namespace: :admin
 
-    assert_equal admin_reports(:support_report), @controller[:report]
+    assert_equal admin_reports(:report_one), @controller[:report]
   end
 
   test "find_resource raises RecordNotFound" do
@@ -93,7 +93,6 @@ class AuthorizerTest < ActiveSupport::TestCase
     end
   end
 
-
   test "authorize with membership role" do
     @controller.instance_variable_set :@membership, documents(:alpha).memberships.first
 
@@ -109,13 +108,13 @@ class AuthorizerTest < ActiveSupport::TestCase
   test "authorize with multiple roles" do
     @controller.instance_variable_set :@membership, documents(:alpha).memberships.first
 
-    assert @controller.authorize(:update, :delete, resource: :membership)
+    assert @controller.authorize([:update, :delete], resource: :membership)
   end
 
-  test "authorize with through and options hash" do
+  test "authorize with through" do
     @controller.instance_variable_set :@membership, documents(:alpha).memberships.first
 
-    assert @controller.authorize(through: :membership, roles: [:download, :fork])
+    assert @controller.authorize(:delete, through: :membership)
   end
 
   test "authorize invokes authentication_admin" do
@@ -137,7 +136,7 @@ class AuthorizerTest < ActiveSupport::TestCase
     @controller.instance_variable_set :@membership, documents(:beta).memberships.first
 
     assert_raises SimonSays::Authorizer::Denied do
-      @controller.authorize(:update, :delete, resource: :membership)
+      @controller.authorize([:update, :delete], resource: :membership)
     end
   end
 end

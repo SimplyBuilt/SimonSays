@@ -18,11 +18,13 @@ module SimonSays
         before_filter :"authenticate_#{scope}!", filter_options(opts)
       end
 
-      def find_and_authorize(resource, opts = {})
+      def find_and_authorize(resource, *roles)
+        opts = roles.extract_options!
+
         before_filter(filter_options(opts)) do
           find_resource resource, opts
 
-          authorize opts if (opts.keys & Roleable.registry.values).any?
+          authorize roles, opts unless roles.empty?
         end
       end
 
@@ -34,7 +36,7 @@ module SimonSays
 
       def authorize_resource(resource, *roles)
         before_filter(filter_options(roles.extract_options!)) do
-          authorize(*roles, { resource: resource })
+          authorize(roles, { resource: resource })
         end
       end
 
@@ -63,16 +65,15 @@ module SimonSays
       instance_variable_set "@#{resource}", record
     end
 
-    # @returns [TrueClass,FalseClass] authorization result
-    def authorize(*args)
-      options = args.extract_options!
-      required = args if args.any?
-
+    # @returns [TrueClass] true if authorization was successful
+    # @raises [Denied] if authorization failed
+    def authorize(required = nil, options)
       if through = options[:through]
         name = through.to_s.singularize.to_sym
       else
         name = options[:resource]
       end
+
       attr = Roleable.registry[name]
       required ||= options[attr.to_sym]
 

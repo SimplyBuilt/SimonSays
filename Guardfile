@@ -9,4 +9,5 @@ guard :minitest do
 
   # watch test Rails app
   watch(%r{^test/rails_app/app/models/(.*)\.rb$})       { |m| "test/models/#{m[1]}_test.rb" }
+  watch(%r{^test/rails_app/app/controllers/(.*)\.rb$})  { |m| "test/controllers/#{m[1]}_test.rb" }
 end
