@@ -191,10 +191,10 @@ class RoleableTest < ActiveSupport::TestCase
   end
 
   test "User is added to registry" do
-    assert_includes SimonSays::Roleable.registry, 'User'
+    assert_includes SimonSays::Roleable.registry, :user
   end
 
   test "Admin is added to registry" do
-    assert_includes SimonSays::Roleable.registry, 'Admin'
+    assert_includes SimonSays::Roleable.registry, :admin
   end
 end

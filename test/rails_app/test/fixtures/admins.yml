@@ -1,11 +1,11 @@
-# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+support:
+  access_mask: 1
 
-# This model initially had no columns defined.  If you add columns to the
-# model remove the '{}' from the fixture names and add the columns immediately
-# below each fixture, per the syntax in the comments below
-#
-one: {}
-# column: value
-#
-two: {}
-#  column: value
+content:
+  access_mask: 2
+
+marketing:
+  access_mask: 4
+
+all:
+  access_mask: <%= Admin::ACCESS.size.times.map { |n| n ** 2 }.sum %>

@@ -31,7 +31,7 @@ module SimonSays
         singular = name.singularize
         const = name.upcase
 
-        Roleable.registry[model_name.to_s] ||= name
+        Roleable.registry[model_name.to_s.downcase.to_sym] ||= name
 
         roles.map!(&:to_sym)
 
