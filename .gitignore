@@ -12,3 +12,5 @@
 *.o
 *.a
 mkmf.log
+
+/test/rails_app/db/*.sqlite3
