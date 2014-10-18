@@ -1,0 +1,3 @@
+export_dir=docs/
+remote=origin
+branch=gh-pages
