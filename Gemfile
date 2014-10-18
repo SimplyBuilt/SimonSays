@@ -6,6 +6,8 @@ gemspec
 group :development do
   gem 'sqlite3'
 
+  gem 'rdoc'
+
   gem 'guard'
   gem 'guard-minitest'
 end
