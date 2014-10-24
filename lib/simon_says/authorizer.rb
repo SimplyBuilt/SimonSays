@@ -46,7 +46,7 @@ module SimonSays
     end
 
     # @returns Primary resource found; need for +authorize+ calls
-    def find_resource(resource, options = {})
+    def find_resource(resource, options = {}) # :nodoc:
       resource = resource.to_s
 
       scope, query = resource_scope_and_query(resource, options)
@@ -66,7 +66,7 @@ module SimonSays
     end
 
 
-    def authorize(required = nil, options)
+    def authorize(required = nil, options) # :nodoc:
       if through = options[:through]
         name = through.to_s.singularize.to_sym
       else
