@@ -40,7 +40,7 @@ module SimonSays
         end
       end
 
-      def filter_options(options)
+      def filter_options(options) # :nodoc:
         { except: options.delete(:except), only: options.delete(:only) }
       end
     end
@@ -65,8 +65,7 @@ module SimonSays
       instance_variable_set "@#{resource}", record
     end
 
-    # @returns [TrueClass] true if authorization was successful
-    # @raises [Denied] if authorization failed
+
     def authorize(required = nil, options)
       if through = options[:through]
         name = through.to_s.singularize.to_sym
@@ -96,7 +95,7 @@ module SimonSays
 
     private
 
-    def resource_scope_and_query(resource, options)
+    def resource_scope_and_query(resource, options) # :nodoc:
       if options[:through]
         field = "#{resource}_id"
 

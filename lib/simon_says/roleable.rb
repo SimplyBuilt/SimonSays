@@ -2,7 +2,7 @@ module SimonSays
   module Roleable
     extend ActiveSupport::Concern
 
-    def self.registry
+    def self.registry # :nodoc:
       # "global" registry we'll use when authorizing
       @registry ||= {}
     end
@@ -12,18 +12,54 @@ module SimonSays
       # Provides a declarative method to introduce role based
       # access controller through a give integer mask.
       #
-      # Expects +role_mask+ to be an attribute. Can use
-      # the +:as+ option to change the prefix for the +_mask+
-      # attribute. This will also alter the method names.
+      # By default it'll use an attributed named +role_mask+. You can
+      # use the +:as+ option to change the prefix for the +_mask+
+      # attribute. This will also alter the names of the dynamically
+      # generated methods.
       #
-      # @example
-      #   has_roles :read, :write, :delete
-      #   has_roles :publish, :payment, as: :site_admin
+      # ===== Example
       #
-      # @overload has_roles(*roles, opts = {})
-      #   @param [Array<Symbol,String>] roles list of roles
-      #   @param [Hash] opts options hash
-      #   @option opts [Symbol, String] :as the role mask attribute to use
+      #   class User < ActiveRecord::Base
+      #     include SimonSays::Roleable
+      #
+      #     has_roles :read, :write, :delete
+      #   end
+      #
+      #   class Editor < ActiveRecord::Base
+      #     include SimonSays::Roleable
+      #
+      #     has_roles :create, :update, :publish, as: :access
+      #   end
+      #
+      # ===== Dynamic Methods
+      #
+      # Several methods are dynamically genreated when calling +has_roles+.
+      # The methods generated include a setter, a getter and a predicate
+      # method. For examples:
+      #
+      #   User.new.roles
+      #   => []
+      #
+      #   User.new(roles: :read).roles
+      #   => [:read]
+      #
+      #   User.new.tap { |u| u.roles = :write, :read }.roles
+      #   => [:read, :write]
+      #
+      #   User.new(roles: [:read, :write]).has_roles? :read, :write
+      #   => true
+      #
+      #   User.new(roles: :read).has_role? :read
+      #   => true
+      #
+      # Here's an example using the +:as+ prefix option:
+      #
+      #   Editor.new(access: %w[create update publish]).access
+      #   => [:create, :update, :publish]
+      #
+      #   Editor.new(access: :publish).has_access? :create
+      #   => false
+      #
       def has_roles *roles
         options = roles.extract_options!
 
