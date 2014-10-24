@@ -13,11 +13,33 @@ module SimonSays
       class_attribute :default_authorization_scope
     end
 
+    # Once +Authorizer+ is included these methods become
+    # available to your controllers.
     module ClassMethods
+      # Authentication convenience method (to keep things declarative).
+      # This method just setups a +before_filter+
+      #
+      # * +scope+ is a symbol or string and should correspond to some sort
+      #   of authentication scope (ie: +authenticate_user!+)
+      # * +opts+ filter options
+      #
+      # ====== Example
+      #
+      #    authenticate :user, expect: :index
+      #
       def authenticate(scope, opts = {})
         before_filter :"authenticate_#{scope}!", filter_options(opts)
       end
 
+      # Find and authorize a resource.
+      #
+      # * +resource+ the name of resource to find
+      # * +roles+ one or more role symbols
+      # * the last argument may also be a filter options hash
+      #
+      # ====== Example
+      #
+      #     find_and_authorize :document, 
       def find_and_authorize(resource, *roles)
         opts = roles.extract_options!
 
@@ -28,12 +50,25 @@ module SimonSays
         end
       end
 
+      # Find a resource
+      #
+      # * +resource+ the name of the resource to find
+      # * +opts+ filter options
       def find_resource(resource, opts = {})
         before_filter(filter_options(opts)) do
           find_resource resource, opts
         end
       end
 
+      # Authorize against a given resource
+      #
+      # * +resource+ the name of the resource to authorize against. The
+      #   resource should include +Roleable+ and define some set of
+      #   roles. This method also expect the record to be available as
+      #   an instance variable (which is the case if +find_resource+ is
+      #   called before hand)
+      # * +roles+ one or more role symbols
+      # * the last argument may also be a filter options hash
       def authorize_resource(resource, *roles)
         before_filter(filter_options(roles.extract_options!)) do
           authorize(roles, { resource: resource })

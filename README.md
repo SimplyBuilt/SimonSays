@@ -108,7 +108,9 @@ method:
     end
 
 Let's start with an example; here we'll create a reports resource that
-only Admin's with support access to use.
+only Admin's with support access to use. The roles are supplied within
+the `authorize_resource` method. Note that, multiple roles can be
+supplied; access is granted if one or more are met.
 
     # routes.rb
     # Reports resource for Admins
@@ -138,6 +140,9 @@ not exist and an `ActiveRecord::NotFound` exception will be raised.
 
 If the membership record exists, but the role conditions are not met,
 `Authorizer` will raise a `Denied` exception.
+
+ If the document is found and the user has the access to it. It will be
+ set as the `@document` instance variable.
 
 ## Contributing
 

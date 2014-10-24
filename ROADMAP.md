@@ -6,3 +6,4 @@
   - Currently we sort of assume you're using devise
 - More expressive `find_and_authorize` syntax
 - Add a way of authorizing against ALL roles not just any role
+- `grep -r TODO .`
