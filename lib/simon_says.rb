@@ -5,5 +5,4 @@ require "simon_says/roleable"
 require "simon_says/authorizer"
 
 module SimonSays
-  # Your code goes here...
 end
