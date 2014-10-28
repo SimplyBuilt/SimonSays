@@ -10,8 +10,8 @@ end
 
 namespace :docs do
   RDoc::Task.new :generate do |rdoc|
-    rdoc.main = "README.doc"
     rdoc.title = "SimonSays RDOC"
+    rdoc.main = "README.md"
 
     rdoc.rdoc_dir = "docs"
     rdoc.rdoc_files.include("README.md", "lib/**/*.rb")
