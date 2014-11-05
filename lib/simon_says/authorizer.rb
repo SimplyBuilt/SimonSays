@@ -39,7 +39,7 @@ module SimonSays
       #
       # ====== Example
       #
-      #     find_and_authorize :document, 
+      #     find_and_authorize :document, :create, :update :publish, through: :memberships
       def find_and_authorize(resource, *roles)
         opts = roles.extract_options!
 
