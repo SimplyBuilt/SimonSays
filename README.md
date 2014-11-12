@@ -33,7 +33,7 @@ against those roles on a controller (and action) basis.
 ### Roleable
 
 First, we need to define roles. Generally speaking roles will exist on
-either User models or on relationship models (like a through model linking a
+either "User" models or on relationship models (like a through model linking a
 User to another resource).
 
 Here's a quick example:
@@ -54,7 +54,7 @@ User can now have none or one more roles:
 
 The roles are stored as an integer. When using `Roleable` you need add a
 `roles_mask` column. Note that we do not have any generators for this yet.
-Feel free to fork add them!
+Feel free to fork and add them!
 
 You can customize this attribute using the `:as` option. For example:
 
@@ -95,7 +95,7 @@ ensuring certain role-based conditions are met.
 
 *Please note*, certain assumptions are made with `Authorizer`. Building
 upon the above `User` and `Admin` models, `Authorizer` would assume
-there is a `current_user` and `current_admin`. If these models
+there is a `current_user` and `current_admin` method. If these models
 correspond to devise scopes this would be the case by default.
 Additionally there would need to a be an `authenticate_user!` and
 `authenticate_admin!` method, which devise provides as well.
