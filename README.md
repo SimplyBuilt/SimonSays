@@ -38,19 +38,23 @@ User to another resource).
 
 Here's a quick example:
 
-    class User < ActiveRecord::Base
-      include SimonSays::Roleable
+```ruby
+class User < ActiveRecord::Base
+  include SimonSays::Roleable
 
-      has_roles :add, :edit, :delete
-    end
+  has_roles :add, :edit, :delete
+end
+```
 
 User can now have zero or more roles:
 
-    User.new.roles
-    => []
+```ruby
+User.new.roles
+=> []
 
-    User.new.tap { |u| u.roles = :add, :edit }.roles
-    => [:add, :edit]
+User.new.tap { |u| u.roles = :add, :edit }.roles
+=> [:add, :edit]
+```
 
 Roles are stored as an integer and bitmasking is used to determine
 authorization logic. When using `Roleable` you need add a `roles_mask`
@@ -60,31 +64,35 @@ free to fork and add them!
 You can customize the role attribute using the `:as` option. For
 example:
 
-    class Admin < ActiveRecord::Base
-      include SimonSays::Roleable
+```ruby
+class Admin < ActiveRecord::Base
+  include SimonSays::Roleable
 
-      has_roles :design, :support, :moderator, as: :access
-    end
+  has_roles :design, :support, :moderator, as: :access
+end
 
-    Admin.new.access
-    => []
+Admin.new.access
+=> []
 
-    Admin.new(access: :support).access
-    => [:support]
+Admin.new(access: :support).access
+=> [:support]
+```
 
 The `Roleable` will expect there to be a `access_mask` column and
 attribute.
 
 You can also use `Roleable` on through models. For example:
 
-    class Membership < ActiveRecord::Base
-      include SimonSays::Roleable
+```ruby
+class Membership < ActiveRecord::Base
+  include SimonSays::Roleable
 
-      belongs_to :user
-      belongs_to :document
+  belongs_to :user
+  belongs_to :document
 
-      has_roles :download, :edit, :delete,
-    end
+  has_roles :download, :edit, :delete,
+end
+```
 
 Calling `has_roles` will dynamically generate several methods as well as
 a dynamically named scope. Be sure to also checkout the
@@ -112,40 +120,46 @@ The first step is to include the concern within the
 `ApplicationController` and to configure the default authorization
 method:
 
-    class ApplicationController < ActionController::Base
-      include SimonSays::Authorizer
+```ruby
+class ApplicationController < ActionController::Base
+  include SimonSays::Authorizer
 
-      self.default_authorization_scope = :current_user
-    end
+  self.default_authorization_scope = :current_user
+end
+```
 
 Let's start with an example; here we'll create a reports resource that
 only Admin's with support access to use. The roles are supplied within
 the `authorize_resource` method. Note that, multiple roles can be
 supplied; access is granted if one or more are met.
 
-    # routes.rb
-    # Reports resource for Admins
-    resources :reports
+```ruby
+# routes.rb
+# Reports resource for Admins
+resources :reports
 
-    # app/controllers/reports_controller.rb
-    class ReportsController < ApplicationController
-      authorize_resource :admin, :support
-      find_resource :report, except: [:index, :new, :create]
-    end
+# app/controllers/reports_controller.rb
+class ReportsController < ApplicationController
+  authorize_resource :admin, :support
+  find_resource :report, except: [:index, :new, :create]
+end
+```
 
 Here's another example using the `Membership` through model and multiple
 calls to `find_and_authorize` to setup various role-based requirements.
 
-    # routes.rb
-    resources :documents
+```ruby
+# routes.rb
+resources :documents
 
-    # app/controllers/documents_controller.rb
-    class DocumentsController < ApplicationController
-      authenticate :user
+# app/controllers/documents_controller.rb
+class DocumentsController < ApplicationController
+  authenticate :user
 
-      find_and_authorize :documents, :edit, through: :memberships, only: [:edit, :update]
-      find_and_authorize :documents, :delete, through: :memberships, only: :destroy
-    end
+  find_and_authorize :documents, :edit, through: :memberships, only: [:edit, :update]
+  find_and_authorize :documents, :delete, through: :memberships, only: :destroy
+end
+```
 
 The document model will not be found if the membership relationship does
 not exist and an `ActiveRecord::NotFound` exception will be raised.
