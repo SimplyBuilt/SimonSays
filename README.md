@@ -50,10 +50,10 @@ User can now have zero or more roles:
 
 ```ruby
 User.new.roles
-=> []
+  # => []
 
 User.new.tap { |u| u.roles = :add, :edit }.roles
-=> [:add, :edit]
+  # => [:add, :edit]
 ```
 
 Roles are stored as an integer and bitmasking is used to determine
@@ -72,10 +72,10 @@ class Admin < ActiveRecord::Base
 end
 
 Admin.new.access
-=> []
+  # => []
 
 Admin.new(access: :support).access
-=> [:support]
+  # => [:support]
 ```
 
 The `Roleable` will expect there to be a `access_mask` column and
