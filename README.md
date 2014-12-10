@@ -118,7 +118,7 @@ authorization and access control. It is not an authentication library.
 
 The first step is to include the concern within the
 `ApplicationController` and to configure the default authorization
-method:
+scope (which is used with the `through` option):
 
 ```ruby
 class ApplicationController < ActionController::Base
@@ -133,6 +133,11 @@ only Admin's with support access to use. The roles are supplied within
 the `authorize_resource` method. Note that, multiple roles can be
 supplied; access is granted if one or more are met.
 
+Using the `:from` option here is also important. This is done so the
+`find_resource` call to load the `@report` resource is properly scoped
+to the `current_admin`. When this option is not used, the resource's
+class is used directly with a `where` call.
+
 ```ruby
 # routes.rb
 # Reports resource for Admins
@@ -141,12 +146,17 @@ resources :reports
 # app/controllers/reports_controller.rb
 class ReportsController < ApplicationController
   authorize_resource :admin, :support
-  find_resource :report, except: [:index, :new, :create]
+  find_resource :report, from: :current_admin, except: [:index, :new, :create]
 end
 ```
 
 Here's another example using the `Membership` through model and multiple
 calls to `find_and_authorize` to setup various role-based requirements.
+
+Note that we do not need to use the `:from` option here since, when
+using the `:through` option, the `default_authorization_scope` is used.
+If the `default_authorization_scope` is not what the `through` option is
+for, then the `from` option should be used instead.
 
 ```ruby
 # routes.rb
