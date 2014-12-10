@@ -7,6 +7,8 @@ This gem is a simple, declarative, role-based access control system for Rails th
 works great with devise! Take a look at the
 [docs](http://www.rubydoc.info/github/SimplyBuilt/SimonSays/) for more details!
 
+![Build Status](https://travis-ci.org/SimplyBuilt/SimonSays.svg)
+
 ## Installation
 
 Add this line to your application's Gemfile:
