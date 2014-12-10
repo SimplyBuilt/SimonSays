@@ -138,7 +138,8 @@ module SimonSays
         scope = send(self.class.default_authorization_scope)
 
       elsif options[:from]
-        scope = instance_variable_get("@#{options[:from]}")
+        scope = instance_variable_get("@#{options[:from]}") || send(options[:from])
+
       else
         klass = (options[:class_name] || resource).to_s
         # TODO support array of namespaces?
