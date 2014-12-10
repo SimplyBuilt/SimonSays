@@ -1,6 +1,8 @@
 language: ruby
 rvm:
-  - "2.0.0"
+  - "2.1.4"
 before_script:
   - cd test/rails_app/
   - bundle exec rake db:migrate db:fixtures:load
+script:
+  - bundle exec rake test
