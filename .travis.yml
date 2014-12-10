@@ -4,5 +4,6 @@ rvm:
 before_script:
   - cd test/rails_app/
   - bundle exec rake db:migrate db:fixtures:load
+  - cd ../..
 script:
   - bundle exec rake test
