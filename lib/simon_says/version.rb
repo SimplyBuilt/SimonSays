@@ -1,3 +1,3 @@
 module SimonSays
-  VERSION = "0.0.27b6"
+  VERSION = "0.0.3"
 end
