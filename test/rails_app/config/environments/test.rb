@@ -13,8 +13,10 @@ Rails.application.configure do
   config.eager_load = true
 
   # Configure static asset server for tests with Cache-Control for performance.
-  config.serve_static_assets  = true
+  config.serve_static_files  = true
   config.static_cache_control = 'public, max-age=3600'
+
+  config.active_support.test_order = :random
 
   # Show full error reports and disable caching.
   config.consider_all_requests_local       = true
@@ -36,4 +38,8 @@ Rails.application.configure do
 
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
+
+  # Use transactional fixtures
+  config.use_transactional_fixtures = true
+
 end
