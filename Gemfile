@@ -8,7 +8,7 @@ group :development do
 
   gem 'rdoc'
 
-  gem 'guard'
+  gem 'guard', "2.10.0"
   gem 'guard-minitest'
 end
 
