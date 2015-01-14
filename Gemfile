@@ -8,8 +8,8 @@ group :development do
 
   gem 'rdoc'
 
-  gem 'guard', "2.10.0"
-  gem 'guard-minitest'
+  gem 'guard'
+  gem 'guard-minitest', "2.3.2"
 end
 
 gem "codeclimate-test-reporter", group: :test, require: nil

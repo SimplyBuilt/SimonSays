@@ -14,7 +14,7 @@
 ActiveRecord::Schema.define(version: 20141017140833) do
 
   create_table "admin_reports", force: true do |t|
-    t.string   "title"
+    t.string   "title",      limit: nil
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -26,7 +26,7 @@ ActiveRecord::Schema.define(version: 20141017140833) do
   end
 
   create_table "documents", force: true do |t|
-    t.string   "title"
+    t.string   "title",      limit: nil
     t.datetime "created_at"
     t.datetime "updated_at"
   end
