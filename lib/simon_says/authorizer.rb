@@ -2,7 +2,7 @@ module SimonSays
   module Authorizer
     extend ActiveSupport::Concern
 
-    class Denied < Exception
+    class Denied < StandardError
       def initialize(as, required, actual)
         # TODO i18n for err message (as should be singluarized with 1 flag)
         super "Access denied; #{required * ', '} role is required. Current access is #{actual * ', '}"
