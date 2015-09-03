@@ -1,6 +1,6 @@
 language: ruby
 cache: bundler
-install: bundle install --without development --deployment --jobs=3 --retry=3
+install: bundle install --without development --jobs=3 --retry=3
 rvm:
   - "2.2.2"
 before_script:
