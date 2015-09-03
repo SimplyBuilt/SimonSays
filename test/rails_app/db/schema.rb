@@ -13,25 +13,25 @@
 
 ActiveRecord::Schema.define(version: 20141017140833) do
 
-  create_table "admin_reports", force: true do |t|
-    t.string   "title",      limit: nil
+  create_table "admin_reports", force: :cascade do |t|
+    t.string   "title",      limit: 255
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  create_table "admins", force: true do |t|
+  create_table "admins", force: :cascade do |t|
     t.integer  "access_mask"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  create_table "documents", force: true do |t|
-    t.string   "title",      limit: nil
+  create_table "documents", force: :cascade do |t|
+    t.string   "title",      limit: 255
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  create_table "memberships", force: true do |t|
+  create_table "memberships", force: :cascade do |t|
     t.integer  "user_id"
     t.integer  "document_id"
     t.integer  "roles_mask",  default: 0
@@ -39,7 +39,7 @@ ActiveRecord::Schema.define(version: 20141017140833) do
     t.datetime "updated_at"
   end
 
-  create_table "users", force: true do |t|
+  create_table "users", force: :cascade do |t|
     t.datetime "created_at"
     t.datetime "updated_at"
   end

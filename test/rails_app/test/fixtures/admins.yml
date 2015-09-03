@@ -8,4 +8,4 @@ marketing:
   access_mask: 4
 
 all:
-  access_mask: <%= Admin::ACCESS.size.times.map { |n| n ** 2 }.sum %>
+  access_mask: <%= (0..Admin::ACCESS.size - 1).map { |n| 2 ** n }.sum %>

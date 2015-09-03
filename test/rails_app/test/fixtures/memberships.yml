@@ -1,7 +1,7 @@
 mb1:
   user: bob
   document: alpha
-  roles_mask: <%= Membership::ROLES.size.times.map { |n| 2 ** n }.sum %>
+  roles_mask: <%= (0..Membership::ROLES.size - 1).map { |n| 2 ** n }.sum %>
 
 mb2:
   user: bob

@@ -1,197 +1,151 @@
 require 'test_helper'
 
 class RoleableTest < ActiveSupport::TestCase
-  setup do
-    create_test_table :test_widgets do |t|
-      t.integer :roles_mask, default: 0
-      t.integer :access_mask, default: 0
-    end
-
-    @klass = Class.new(ActiveRecord::Base) do
-      self.table_name = 'test_widgets'
-
-      def self.name
-        'User'
-      end
-
-      include SimonSays::Roleable
-
-      has_roles :read, :write
-    end
-
-    @as_klass = Class.new(ActiveRecord::Base) do
-      self.table_name = 'test_widgets'
-
-      def self.name
-        'Admin'
-      end
-
-      include SimonSays::Roleable
-
-      has_roles :moderator, :support, :editor, as: :access
-    end
-
-    @instance = @klass.new
-    @as_instance = @as_klass.new
-  end
-
   test "adds constant" do
-    assert_equal [:read, :write], @klass::ROLES
+    assert_equal [:download, :fork, :edit, :delete], Membership::ROLES
   end
 
   test "adds constant with :as option" do
-    assert_equal [:moderator, :support, :editor], @as_klass::ACCESS
+    assert_equal [:support, :content, :marketing], Admin::ACCESS
   end
 
   test "adds roles method" do
-    assert @instance.respond_to?(:roles)
-  end
-
-  test "adds roles= method" do
-    assert @instance.respond_to?(:roles=)
+    assert_equal Membership::ROLES, memberships(:mb1).roles
   end
 
   test "adds reader method with :as option" do
-    assert @as_instance.respond_to?(:access)
+    assert_equal Admin::ACCESS, admins(:all).access
   end
 
-  test "adds writer method with :as option" do
-    assert @as_instance.respond_to?(:access=)
+  test "set roles with multiple symbols" do
+    mbr = memberships(:mb2)
+    mbr.roles = :download, :fork
+
+    assert_equal [:download, :fork], mbr.roles
   end
 
-  test 'roles returns array of symbols' do
-    @instance.roles_mask = 3
+  test "set roles with multiple symbols with :as option" do
+    adm = admins(:support)
+    adm.access = :support, :marketing
 
-    assert_equal [:read, :write], @instance.roles
+    assert_equal [:support, :marketing], adm.access
   end
 
-  test 'roles returns array of symbols with :as option' do
-    @as_instance.access_mask = 6
+  test "set roles with single symbol" do
+    mbr = memberships(:mb2)
+    mbr.roles = :download
 
-    assert_equal [:support, :editor], @as_instance.access
+    assert_equal [:download], mbr.roles
   end
 
-  test "set single symbol" do
-    @instance.roles = :read
+  test "set roles with single symbol with :as option" do
+    adm = admins(:support)
+    adm.access = :marketing
 
-    assert_equal 1, @instance.roles_mask
+    assert_equal [:marketing], adm.access
   end
 
-  test "set single symbol with :as option" do
-    @as_instance.access = :moderator
+  test "set roles with single string" do
+    mbr = memberships(:mb2)
+    mbr.roles = 'download'
 
-    assert_equal 1, @as_instance.access_mask
+    assert_equal [:download], mbr.roles
   end
 
-  test "set single string" do
-    @instance.roles = 'write'
+  test "set roles with single string with :as option" do
+    adm = admins(:support)
+    adm.access = 'marketing'
 
-    assert_equal 2, @instance.roles_mask
+    assert_equal [:marketing], adm.access
   end
 
-  test "set single string with :as option" do
-    @as_instance.access = 'support'
+  test "set roles with multiple strings" do
+    mbr = memberships(:mb2)
+    mbr.roles = 'download', 'fork'
 
-    assert_equal 2, @as_instance.access_mask
+    assert_equal [:download, :fork], mbr.roles
   end
 
-  test "set with multi symbols" do
-    @instance.roles = :read, :write
+  test "set roles with multiples strings with :as option" do
+    adm = admins(:support)
+    adm.access = 'marketing', 'content'
 
-    assert_equal 3, @instance.roles_mask
+    assert_equal [:content, :marketing], adm.access
   end
 
-  test "set with multi symbols with :as option" do
-    @as_instance.access = :support, :editor
+  test 'ignores unknown roles' do
+    mbr = memberships(:mb2)
+    mbr.roles = :download, :unknown
 
-    assert_equal 6, @as_instance.access_mask
+    assert_equal [:download], mbr.roles
   end
 
-  test "set with multi strings" do
-    @instance.roles = 'read', 'write'
+  test 'handles out of order roles' do
+    mbr = memberships(:mb2)
+    mbr.roles = Membership::ROLES.reverse
 
-    assert_equal 3, @instance.roles_mask
-  end
-
-  test "set with multi strings with :as option" do
-    @as_instance.access = 'support', 'editor'
-
-    assert_equal 6, @as_instance.access_mask
-  end
-
-  test 'set with array of strings' do
-    @instance.roles = ['read', 'write']
-
-    assert_equal 3, @instance.roles_mask
-  end
-
-  test 'set with array of strings with :as option' do
-    @as_instance.access = ['support', 'editor']
-
-    assert_equal 6, @as_instance.access_mask
-  end
-
-  test "set out order" do
-    @as_instance.access = :editor, :moderator, :support
-
-    assert_equal 7, @as_instance.access_mask
+    assert_equal Membership::ROLES, mbr.roles
   end
 
   test "has_roles? without any roles" do
-    assert_equal false, @instance.has_roles?(:read)
+    mbr = memberships(:mb1)
+    mbr.roles = nil
+
+    assert_equal false, mbr.has_roles?(:download)
   end
 
   test "has_roles? with one role" do
-    @instance.roles = :read
+    mbr = memberships(:mb1)
+    mbr.roles = :download
 
-    assert_equal true, @instance.has_roles?(:read)
+    assert_equal true, mbr.has_roles?(:download)
   end
 
   test "has_roles? with multiple role" do
-    @instance.roles = :read, :write
+    mbr = memberships(:mb1)
+    mbr.roles = :download, :fork, :edit
 
-    assert_equal true, @instance.has_roles?(:read, :write)
+    assert_equal true, mbr.has_roles?(:download, :fork, :edit)
   end
 
   test "has_access? without any roles" do
-    assert_equal false, @as_instance.has_access?(:support)
+    adm = admins(:support)
+    adm.access = nil
+
+    assert_equal false, adm.has_access?(:support)
   end
 
   test "has_access? with one role" do
-    @as_instance.access = :editor
+    adm = admins(:support)
+    adm.access = :marketing
 
-    assert_equal true, @as_instance.has_access?(:editor)
+    assert_equal true, adm.has_access?(:marketing)
   end
 
   test "has_access? with multiple role" do
-    @as_instance.access = :moderator, :support
+    adm = admins(:support)
+    adm.access = :support, :content, :marketing
 
-    assert_equal true, @as_instance.has_access?(:moderator, :support)
+    assert_equal true, adm.has_access?(:support, :content, :marketing)
   end
 
-  test "named scope" do
-    @klass.create roles: :read
-    @klass.create roles: :write
-
-    assert_equal [1, 1], [
-      @klass.with_roles(:read).count,
-      @klass.with_roles(:write).count
+  test "named scope with_roles" do
+    assert_equal [2, 1], [
+      Membership.with_roles(:download).count,
+      Membership.with_roles(:delete).count
     ]
   end
 
-  test "named scope with :as option" do
-    @as_klass.create access: :moderator
-    @as_klass.create access: [:support, :editor]
-
-    assert_equal [1, 1, 1], [
-      @as_klass.with_access(:moderator).count,
-      @as_klass.with_access(:editor).count,
-      @as_klass.with_access(:support).count,
+  test "named scope with_access" do
+    assert_equal [2, 2, 2], [
+      Admin.with_access(:marketing).count,
+      Admin.with_access(:content).count,
+      Admin.with_access(:support).count
     ]
   end
 
-  test "User is added to registry" do
-    assert_includes SimonSays::Roleable.registry, :user
+  test "Membership is added to registry" do
+    assert_includes SimonSays::Roleable.registry, :membership
   end
 
   test "Admin is added to registry" do

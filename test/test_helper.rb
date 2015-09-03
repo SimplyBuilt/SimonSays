@@ -31,7 +31,7 @@ ActiveRecord::Migrator.migrate(File.expand_path("../rails_app/db/migrate/", __FI
 class ActiveSupport::TestCase
   include ActiveRecord::TestFixtures
 
-  fixtures :users, :admins, :documents, :'admin/reports'
+  fixtures :all
 
   def create_test_table(name, &block)
     with_migration { |m| m.create_table name, &block }
