@@ -76,6 +76,8 @@ module SimonSays
 
           def #{name}=(args)
             args = [args] unless Array === args
+
+            args.compact!
             args.map!(&:to_sym)
 
             self[:#{name}_mask] = (args & #{const}).map { |i| 2 ** #{const}.index(i) }.sum
@@ -99,7 +101,7 @@ module SimonSays
         # Declare a scope for finding records with a given role set
         # TODO support an array roles (must match ALL)
         scope "with_#{name}", ->(role) {
-          where("(#{name}_mask & ?) > 0", 2**roles.index(role))
+          where("(#{name}_mask & ?) > 0", 2**roles.index(role.to_sym))
         }
       end
     end
