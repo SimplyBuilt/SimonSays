@@ -76,7 +76,7 @@ module SimonSays
       end
 
       def filter_options(options) # :nodoc:
-        { except: options.delete(:except), only: options.delete(:only) }
+        { except: options.delete(:except), only: options.delete(:only), prepend: options.delete(:prepend) }
       end
     end
 
