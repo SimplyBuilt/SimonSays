@@ -17,7 +17,7 @@ module SimonSays
     # available to your controllers.
     module ClassMethods
       # Authentication convenience method (to keep things declarative).
-      # This method just setups a +before_filter+
+      # This method just setups a +before_action+
       #
       # * +scope+ is a symbol or string and should correspond to some sort
       #   of authentication scope (ie: +authenticate_user!+)
@@ -28,7 +28,7 @@ module SimonSays
       #    authenticate :user, expect: :index
       #
       def authenticate(scope, opts = {})
-        before_filter :"authenticate_#{scope}!", filter_options(opts)
+        before_action :"authenticate_#{scope}!", filter_options(opts)
       end
 
       # Find and authorize a resource.
@@ -43,7 +43,7 @@ module SimonSays
       def find_and_authorize(resource, *roles)
         opts = roles.extract_options!
 
-        before_filter(filter_options(opts)) do
+        before_action(filter_options(opts)) do
           find_resource resource, opts
 
           authorize roles, opts unless roles.empty?
@@ -55,7 +55,7 @@ module SimonSays
       # * +resource+ the name of the resource to find
       # * +opts+ filter options
       def find_resource(resource, opts = {})
-        before_filter(filter_options(opts)) do
+        before_action(filter_options(opts)) do
           find_resource resource, opts
         end
       end
@@ -70,7 +70,7 @@ module SimonSays
       # * +roles+ one or more role symbols
       # * the last argument may also be a filter options hash
       def authorize_resource(resource, *roles)
-        before_filter(filter_options(roles.extract_options!)) do
+        before_action(filter_options(roles.extract_options!)) do
           authorize(roles, { resource: resource })
         end
       end

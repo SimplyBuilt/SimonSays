@@ -1,5 +1,5 @@
 require 'test_helper'
-
+require 'pry'
 class DocumentsControllerTest < ActionController::TestCase
   setup do
     @alpha = documents(:alpha)
@@ -20,9 +20,8 @@ class DocumentsControllerTest < ActionController::TestCase
   test "show" do
     as_bob!
 
-    get :show, id: @alpha.id, format: :json
+    get :show, params: { id: @alpha.id, format: "json" }
 
-    refute_nil assigns(:document)
     assert_response :success
   end
 
@@ -30,16 +29,15 @@ class DocumentsControllerTest < ActionController::TestCase
     as_jim!
 
     assert_raises ActiveRecord::RecordNotFound do
-      get :show, id: @alpha.id, format: :json
+      get :show, params: { id: @alpha.id, format: :json }
     end
   end
 
   test "update with access" do
     as_bob!
 
-    patch :update, id: @alpha.id, document: { title: 'Test' }, format: :json
+    patch :update, params: { id: @alpha.id, document: { title: 'Test' }, format: :json }
 
-    refute_nil assigns(:document)
     assert_response :success
   end
 
@@ -47,7 +45,7 @@ class DocumentsControllerTest < ActionController::TestCase
     as_bob!
 
     assert_raises SimonSays::Authorizer::Denied do
-      patch :update, id: @beta.id, document: { title: 'Test' }, format: :json
+      patch :update, params: { id: @beta.id, document: { title: 'Test' }, format: :json }
     end
   end
 
@@ -55,7 +53,7 @@ class DocumentsControllerTest < ActionController::TestCase
     as_jim!
 
     assert_raises ActiveRecord::RecordNotFound do
-      patch :update, id: @alpha.id, document: { title: 'Test' }, format: :json
+      patch :update, params: { id: @alpha.id, document: { title: 'Test' }, format: :json }
     end
   end
 
@@ -63,17 +61,15 @@ class DocumentsControllerTest < ActionController::TestCase
     as_bob!
 
     assert_difference 'Document.count', -1 do
-      delete :destroy, id: @alpha.id, format: :json
+      delete :destroy, params: { id: @alpha.id, format: :json }
     end
-
-    refute_nil assigns(:document)
   end
 
   test "destroy without access" do
     as_bob!
 
     assert_raises SimonSays::Authorizer::Denied do
-      delete :destroy, id: @beta.id, format: :json
+      delete :destroy, params: { id: @beta.id, format: :json }
     end
   end
 
@@ -81,7 +77,7 @@ class DocumentsControllerTest < ActionController::TestCase
     as_jim!
 
     assert_raises ActiveRecord::RecordNotFound do
-      delete :destroy, id: @beta.id, format: :json
+      delete :destroy, params: { id: @beta.id, format: :json }
     end
   end
 end
