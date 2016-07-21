@@ -6,7 +6,7 @@ require 'simon_says/version'
 Gem::Specification.new do |spec|
   spec.name          = "simon_says"
   spec.version       = SimonSays::VERSION
-  spec.authors       = ["Michael Coyne"]
+  spec.authors       = ["Michael Coyne", "Cameron Craig", "SimplyBuilt"]
   spec.email         = ["mikeycgto@gmail.com"]
   spec.summary       = %q{Light-weight, declarative authorization and access control for Rails}
   spec.description   = %q{This gem is a simple, easy-to-use declarative role-based access control system for Rails}
