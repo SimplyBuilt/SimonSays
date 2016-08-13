@@ -1,4 +1,4 @@
-class CreateAdminReports < ActiveRecord::Migration
+class CreateAdminReports < ActiveRecord::Migration[5.0]
   def change
     create_table :admin_reports do |t|
       t.string :title

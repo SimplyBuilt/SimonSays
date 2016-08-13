@@ -1,4 +1,4 @@
-class CreateAdmins < ActiveRecord::Migration
+class CreateAdmins < ActiveRecord::Migration[5.0]
   def change
     create_table :admins do |t|
       t.integer   :access_mask
