@@ -3,9 +3,5 @@ cache: bundler
 install: bundle install --jobs=3 --retry=3
 rvm:
   - "2.3.1"
-before_script:
-  - cd test/rails_app/
-  - RAILS_ENV=test bundle exec rake db:migrate db:fixtures:load
-  - cd ../..
 script:
   - bundle exec rake test
