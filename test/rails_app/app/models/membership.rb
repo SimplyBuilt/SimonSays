@@ -1,4 +1,4 @@
-class Membership < ActiveRecord::Base
+class Membership < ApplicationRecord
   include SimonSays::Roleable
 
   belongs_to :user

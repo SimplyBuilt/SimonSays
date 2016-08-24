@@ -1,2 +1,2 @@
-class Admin::Report < ActiveRecord::Base
+class Admin::Report < ApplicationRecord
 end
