@@ -4,4 +4,5 @@ Rails.application.routes.draw do
   end
 
   resources :documents
+  resources :images, only: :show
 end

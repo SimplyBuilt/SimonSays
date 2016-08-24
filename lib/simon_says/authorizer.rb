@@ -148,7 +148,7 @@ module SimonSays
         scope = klass.classify.constantize
       end
 
-      field ||= :id
+      field ||= options.fetch(:find_attribute, :id)
       query ||= { field => params[:id] }
 
       return scope, query
