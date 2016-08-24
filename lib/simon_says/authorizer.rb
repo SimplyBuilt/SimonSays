@@ -33,16 +33,16 @@ module SimonSays
       # @param [Symbol, String] resource name of resource to find
       # @param [Array<Symbol, String>] roles one or more role symbols or strings
       # @param [Hash] opts before_action and finder options
+      # @param opts [Symbol] :from corresponds to an instance variable or method that
+      #   returns an ActiveRecord scope or model instance. If the object +respond_to?+
+      #   to the pluralized resource name it is called and used as the finder scope. This
+      #   makes it easy to handle finding resource through associations.
       # @param opts [Symbol] :find_attribute attribute resource is found by; by
       #   default, +:id+ is used
       # @param opts [Symbol] :through through model to use when finding resource
       # @param opts [Symbol] :namespace resource namespace
-      # @param opts [Symbol] :through through model to use when finding resource
       #
-      # @example Find and authorize with a +:through+ option
-      #   find_and_authorize :document, :create, :update :publish, through: :memberships
-      # @example Find a resource using a namespace
-      #   find_resource :report, namespace: :admin
+      # @see #find_resource for finder option examples
       def find_and_authorize(resource, *roles)
         opts = roles.extract_options!
 
@@ -57,13 +57,26 @@ module SimonSays
       #
       # @param [Symbol, String] resource name of resource to find
       # @param [Hash] opts before_action and finder options
+      # @param opts [Symbol] :from corresponds to an instance variable or method that
+      #   returns an ActiveRecord scope or model instance. If the object +respond_to?+
+      #   to the pluralized resource name it is called and used as the finder scope. This
+      #   makes it easy to handle finding resource through associations.
       # @param opts [Symbol] :find_attribute attribute resource is found by; by
       #   default, +:id+ is used
       # @param opts [Symbol] :through through model to use when finding resource
       # @param opts [Symbol] :namespace resource namespace
       #
+      # @example Find with a +:through+ option
+      #   find_and_authorize :document, :create, :update :publish, through: :memberships
+      # @example Find and authorize with a +:from+ option
+      #   # +@site.pages+ would be finder scope and is treated like an association
+      #   find_and_authorize :page, from: :site
       # @example Find resource with a +:find_attribute+ option
+      #   # the where clause is now +where(token: params[:id])+
       #   find_resource :image, find_attribute: :token
+      # @example Find a resource using a namespace
+      #   # Admin::Report is the class and query scope used
+      #   find_resource :report, namespace: :admin
       def find_resource(resource, opts = {})
         before_action action_options(opts) do
           find_resource resource, opts
@@ -110,7 +123,7 @@ module SimonSays
       through = options[:through] ? options[:through].to_s : nil
 
       assoc = through || (options[:from] ? resource.pluralize : nil)
-      scope = scope.send(assoc) if assoc
+      scope = scope.send(assoc) if assoc && scope.respond_to?(assoc)
 
       record = scope.where(query).first!
 
