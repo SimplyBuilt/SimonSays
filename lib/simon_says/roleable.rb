@@ -8,7 +8,6 @@ module SimonSays
     end
 
     module ClassMethods
-      ##
       # Provides a declarative method to introduce role based
       # access controller through a give integer mask.
       #
@@ -17,8 +16,15 @@ module SimonSays
       # attribute. This will also alter the names of the dynamically
       # generated methods.
       #
-      # ===== Example
+      # Several methods are dynamically genreated when calling +has_roles+.
+      # The methods generated include a setter, a getter and a predicate
+      # method
       #
+      # @param [Array<Symbol, String>] roles array of role symbols or strings
+      # @param [Hash] opts options hash
+      # @param opts [Symbol] :as alternative prefix name instead of "role"
+      #
+      # @example Detailed example:
       #   class User < ActiveRecord::Base
       #     include SimonSays::Roleable
       #
@@ -30,12 +36,6 @@ module SimonSays
       #
       #     has_roles :create, :update, :publish, as: :access
       #   end
-      #
-      # ===== Dynamic Methods
-      #
-      # Several methods are dynamically genreated when calling +has_roles+.
-      # The methods generated include a setter, a getter and a predicate
-      # method. For examples:
       #
       #   User.new.roles
       #   => []
@@ -51,8 +51,6 @@ module SimonSays
       #
       #   User.new(roles: :read).has_role? :read
       #   => true
-      #
-      # Here's an example using the +:as+ prefix option:
       #
       #   Editor.new(access: %w[create update publish]).access
       #   => [:create, :update, :publish]

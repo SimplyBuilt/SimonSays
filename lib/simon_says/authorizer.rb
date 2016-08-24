@@ -19,9 +19,9 @@ module SimonSays
       # Authentication convenience method (to keep things declarative).
       # This method just setups a +before_action+
       #
-      # * +scope+ is a symbol or string and should correspond to some sort
-      #   of authentication scope (ie: +authenticate_user!+)
-      # * +opts+ filter options
+      # @param [Symbol, String] scope corresponds to some sort of authentication
+      #   scope (ie: +authenticate_user!+)
+      # @param [Hash] opts before_action options
       #
       # ====== Example
       #
@@ -33,13 +33,19 @@ module SimonSays
 
       # Find and authorize a resource.
       #
-      # * +resource+ the name of resource to find
-      # * +roles+ one or more role symbols
-      # * the last argument may also be a filter options hash
+      # @param [Symbol, String] resource name of resource to find
+      # @param [Array<Symbol, String>] roles one or more role symbols or strings
+      # @param [Hash] opts before_action and finder options
+      # @param opts [Symbol] :find_attribute attribute resource is found by; by
+      #   default, +:id+ is used
+      # @param opts [Symbol] :through through model to use when finding resource
+      # @param opts [Symbol] :namespace resource namespace
+      # @param opts [Symbol] :through through model to use when finding resource
       #
-      # ====== Example
-      #
-      #     find_and_authorize :document, :create, :update :publish, through: :memberships
+      # @example Find and authorize with a +:through+ option
+      #   find_and_authorize :document, :create, :update :publish, through: :memberships
+      # @example Find a resource using a namespace
+      #   find_resource :report, namespace: :admin
       def find_and_authorize(resource, *roles)
         opts = roles.extract_options!
 
@@ -52,36 +58,45 @@ module SimonSays
 
       # Find a resource
       #
-      # * +resource+ the name of the resource to find
-      # * +opts+ filter options
+      # @param [Symbol, String] resource name of resource to find
+      # @param [Hash] opts before_action and finder options
+      # @param opts [Symbol] :find_attribute attribute resource is found by; by
+      #   default, +:id+ is used
+      # @param opts [Symbol] :through through model to use when finding resource
+      # @param opts [Symbol] :namespace resource namespace
+      #
+      # @example Find resource with a +:find_attribute+ option
+      #   find_resource :image, find_attribute: :token
       def find_resource(resource, opts = {})
-        before_action(filter_options(opts)) do
+        before_action filter_options(opts) do
           find_resource resource, opts
         end
       end
 
       # Authorize against a given resource
       #
-      # * +resource+ the name of the resource to authorize against. The
-      #   resource should include +Roleable+ and define some set of
-      #   roles. This method also expect the record to be available as
-      #   an instance variable (which is the case if +find_resource+ is
-      #   called before hand)
-      # * +roles+ one or more role symbols
-      # * the last argument may also be a filter options hash
+      # @param [Symbol, String] resource name of resource to find
+      # @param [Array<Symbol, String>] roles one or more role symbols or strings
+      # @param [Hash] opts before_action options
+      #
+      # @example Authorize resource
+      #   authorize_resource :admin, :support
       def authorize_resource(resource, *roles)
-        before_action(filter_options(roles.extract_options!)) do
-          authorize(roles, { resource: resource })
+        opts = roles.extract_options!
+
+        before_action filter_options(opts) do
+          authorize roles, { resource: resource }
         end
       end
 
-      def filter_options(options) # :nodoc:
+      # @private
+      def filter_options(options)
         { except: options.delete(:except), only: options.delete(:only), prepend: options.delete(:prepend) }
       end
     end
 
-    # @returns Primary resource found; need for +authorize+ calls
-    def find_resource(resource, options = {}) # :nodoc:
+    # @private
+    def find_resource(resource, options = {})
       resource = resource.to_s
 
       scope, query = resource_scope_and_query(resource, options)
@@ -100,8 +115,8 @@ module SimonSays
       instance_variable_set "@#{resource}", record
     end
 
-
-    def authorize(required = nil, options) # :nodoc:
+    # @private
+    def authorize(required = nil, options)
       if through = options[:through]
         name = through.to_s.singularize.to_sym
       else
@@ -130,7 +145,8 @@ module SimonSays
 
     private
 
-    def resource_scope_and_query(resource, options) # :nodoc:
+    # @private
+    def resource_scope_and_query(resource, options)
       if options[:through]
         field = "#{resource}_id"
 
