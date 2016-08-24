@@ -3,6 +3,7 @@ module SimonSays
     extend ActiveSupport::Concern
 
     class Denied < StandardError
+      # @private
       def initialize(as, required, actual)
         # TODO i18n for err message (as should be singluarized with 1 flag)
         super "Access denied; #{required * ', '} role is required. Current access is #{actual * ', '}"
@@ -13,8 +14,6 @@ module SimonSays
       class_attribute :default_authorization_scope
     end
 
-    # Once +Authorizer+ is included these methods become
-    # available to your controllers.
     module ClassMethods
       # Authentication convenience method (to keep things declarative).
       # This method just setups a +before_action+
@@ -23,12 +22,10 @@ module SimonSays
       #   scope (ie: +authenticate_user!+)
       # @param [Hash] opts before_action options
       #
-      # ====== Example
-      #
+      # @example Authentication user scope
       #    authenticate :user, expect: :index
-      #
       def authenticate(scope, opts = {})
-        before_action :"authenticate_#{scope}!", filter_options(opts)
+        before_action :"authenticate_#{scope}!", action_options(opts)
       end
 
       # Find and authorize a resource.
@@ -49,7 +46,7 @@ module SimonSays
       def find_and_authorize(resource, *roles)
         opts = roles.extract_options!
 
-        before_action(filter_options(opts)) do
+        before_action(action_options(opts)) do
           find_resource resource, opts
 
           authorize roles, opts unless roles.empty?
@@ -68,7 +65,7 @@ module SimonSays
       # @example Find resource with a +:find_attribute+ option
       #   find_resource :image, find_attribute: :token
       def find_resource(resource, opts = {})
-        before_action filter_options(opts) do
+        before_action action_options(opts) do
           find_resource resource, opts
         end
       end
@@ -84,18 +81,28 @@ module SimonSays
       def authorize_resource(resource, *roles)
         opts = roles.extract_options!
 
-        before_action filter_options(opts) do
+        before_action action_options(opts) do
           authorize roles, { resource: resource }
         end
       end
 
+      # Extract before_action options from Hash
+      #
       # @private
-      def filter_options(options)
+      # @param [Hash] options input options hash
+      # @param options [Symbol] :expect before_action expect option
+      # @param options [Symbol] :only before_action only option
+      # @param options [Symbol] :prepend before_action prepend option
+      def action_options(options)
         { except: options.delete(:except), only: options.delete(:only), prepend: options.delete(:prepend) }
       end
     end
 
+    # Internal find_resource instance method
+    #
     # @private
+    # @param [Symbol, String] resource name of resource to find
+    # @param [Hash] options finder options
     def find_resource(resource, options = {})
       resource = resource.to_s
 
@@ -115,7 +122,11 @@ module SimonSays
       instance_variable_set "@#{resource}", record
     end
 
+    # Internal authorize instance method
+    #
     # @private
+    # @param [Symbol, String] one or more required roles
+    # @param [Hash] options authorizer options
     def authorize(required = nil, options)
       if through = options[:through]
         name = through.to_s.singularize.to_sym
@@ -124,9 +135,10 @@ module SimonSays
       end
 
       attr = Roleable.registry[name]
-      required ||= options[attr.to_sym]
 
+      required ||= options[attr.to_sym]
       required = [required] unless Array === required
+
       record = instance_variable_get("@#{name}")
 
       if record.nil? # must be devise scope
