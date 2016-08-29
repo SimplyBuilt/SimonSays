@@ -39,6 +39,8 @@ module SimonSays
       #   makes it easy to handle finding resource through associations.
       # @param opts [Symbol] :find_attribute attribute resource is found by; by
       #   default, +:id+ is used
+      # @param opts [Symbol] :param_key params key for resource query; by default,
+      #   +:id+ is used
       # @param opts [Symbol] :through through model to use when finding resource
       # @param opts [Symbol] :namespace resource namespace
       #
@@ -63,6 +65,8 @@ module SimonSays
       #   makes it easy to handle finding resource through associations.
       # @param opts [Symbol] :find_attribute attribute resource is found by; by
       #   default, +:id+ is used
+      # @param opts [Symbol] :param_key params key for resource query; by default,
+      #   +:id+ is used
       # @param opts [Symbol] :through through model to use when finding resource
       # @param opts [Symbol] :namespace resource namespace
       #
@@ -190,7 +194,7 @@ module SimonSays
       end
 
       field ||= options.fetch(:find_attribute, :id)
-      query ||= { field => params[:id] }
+      query ||= { field => params[options.fetch(:param_key, :id)] }
 
       return scope, query
     end
