@@ -10,7 +10,3 @@ group :development do
   gem 'guard'
   gem 'guard-minitest', "2.3.2"
 end
-
-group :test do
-  gem "codeclimate-test-reporter", require: false
-end
