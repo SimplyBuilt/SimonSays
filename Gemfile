@@ -1,7 +1,5 @@
 source 'https://rubygems.org'
-ruby '2.3.1'
 
-# Specify your gem's dependencies in auth_lib.gemspec
 gemspec
 
 group :development do
