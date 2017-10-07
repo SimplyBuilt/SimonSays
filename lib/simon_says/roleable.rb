@@ -2,11 +2,6 @@ module SimonSays
   module Roleable
     extend ActiveSupport::Concern
 
-    def self.registry # :nodoc:
-      # "global" registry we'll use when authorizing
-      @registry ||= {}
-    end
-
     module ClassMethods
       # Provides a declarative method to introduce role based
       # access controller through a give integer mask.
@@ -65,8 +60,6 @@ module SimonSays
         singular = name.singularize
         const = name.upcase
 
-        Roleable.registry[model_name.to_s.downcase.to_sym] ||= name
-
         roles.map!(&:to_sym)
 
         class_eval <<-RUBY_EVAL, __FILE__, __LINE__
@@ -87,6 +80,10 @@ module SimonSays
 
           def has_#{name}?(*args)
             (#{name} & args).size > 0
+          end
+
+          def self.role_attribute_name
+            :#{name}
           end
         RUBY_EVAL
 

@@ -144,11 +144,11 @@ class RoleableTest < ActiveSupport::TestCase
     ]
   end
 
-  test "Membership is added to registry" do
-    assert_includes SimonSays::Roleable.registry, :membership
+  test "Membership defines role_attribute_name" do
+    assert_equal :roles, Membership.role_attribute_name
   end
 
-  test "Admin is added to registry" do
-    assert_includes SimonSays::Roleable.registry, :admin
+  test "Admin defines role_attribute_name" do
+    assert_equal :access, Admin.role_attribute_name
   end
 end

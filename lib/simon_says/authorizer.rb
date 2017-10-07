@@ -151,11 +151,6 @@ module SimonSays
         name = options[:resource]
       end
 
-      attr = Roleable.registry[name]
-
-      required ||= options[attr.to_sym]
-      required = [required] unless Array === required
-
       record = instance_variable_get("@#{name}")
 
       if record.nil? # must be devise scope
@@ -163,12 +158,16 @@ module SimonSays
         send "authenticate_#{name}!"
       end
 
-      actual = record.send(attr)
+      role_attr = record.class.role_attribute_name
+      actual = record.send(role_attr)
+
+      required ||= options[role_attr]
+      required = [required] unless Array === required
 
       # actual roles must have at least
       # one required role (array intersection)
       ((required & actual).size > 0).tap do |res|
-        raise Denied.new(attr, required, actual) unless res
+        raise Denied.new(role_attr, required, actual) unless res
       end
     end
 
@@ -187,7 +186,6 @@ module SimonSays
 
       else
         klass = (options[:class_name] || resource).to_s
-        # TODO support array of namespaces?
         klass = "#{options[:namespace]}/#{klass}" if options[:namespace]
 
         scope = klass.classify.constantize
