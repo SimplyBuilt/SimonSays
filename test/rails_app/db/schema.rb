@@ -13,35 +13,35 @@
 ActiveRecord::Schema.define(version: 20160823220959) do
 
   create_table "admin_reports", force: :cascade do |t|
-    t.string   "title"
+    t.string "title"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
 
   create_table "admins", force: :cascade do |t|
-    t.integer  "access_mask"
-    t.datetime "created_at",  null: false
-    t.datetime "updated_at",  null: false
+    t.integer "access_mask"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "documents", force: :cascade do |t|
-    t.string   "title"
+    t.string "title"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
 
   create_table "images", force: :cascade do |t|
-    t.string   "token"
+    t.string "token"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
 
   create_table "memberships", force: :cascade do |t|
-    t.integer  "user_id"
-    t.integer  "document_id"
-    t.integer  "roles_mask",  default: 0
-    t.datetime "created_at",              null: false
-    t.datetime "updated_at",              null: false
+    t.integer "user_id"
+    t.integer "document_id"
+    t.integer "roles_mask", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["document_id"], name: "index_memberships_on_document_id"
     t.index ["user_id"], name: "index_memberships_on_user_id"
   end
