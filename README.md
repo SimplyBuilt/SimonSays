@@ -24,18 +24,16 @@ SimonSays consists of two parts:
 
 1. A [Roleable](#roleable) concern which provides a way to define access roles
    on User models or on join through models.
-2. An [Authorizer](#authorizer) concern which provides a declarative,
-   action filter-like API to controllers which makes it easy to find and
-   authorize resources.
+2. An [Authorizer](#authorizer) concern which provides a declarative API
+   to controllers for finding and authorizing model resources.
 
 #### Roleable
 
 First, we need to define some roles on a model. Roles are stored as an
 integer and [bitmasking](https://en.wikipedia.org/wiki/Mask_(computing))
-is used to determine the roles assigned for that user or model.
-
-SimonSays provides a generator for creating a new migration for this
-required attribute:
+is used to determine the roles assigned for that model. SimonSays
+provides a generator for creating a new migration for this required
+attribute:
 
 ```bash
 rails g active_record:simon_says User
@@ -161,16 +159,17 @@ or `find_and_authorize`. For example, consider this
 class DocumentsController < ApplicationController
   authenticate :user
 
-  find_and_authorize :documents, :edit, through: :permissions, only: [:edit, :update]
-  find_and_authorize :documents, :delete, through: :permissions, only: :destroy
+  find_and_authorize :document, :edit, through: :permissions, only: [:edit, :update]
+  find_and_authorize :document, :delete, through: :permissions, only: :destroy
 end
 ```
 
-This controller will find Document resources and assign them to the
+This controller will find a Document resource and assign it to the
 `@document` instance variable. For the `:edit` and `:update` actions,
 it'll require a permission with an `:edit` role. For the `:destroy`
-method, a permission with the `:delete` role is required. It is possible
-for a given User to have both, one, or neither of those roles.
+method, a permission with the `:delete` role is required. Since the
+`:through` option is used, a `@permission` instance variable will also
+be created.
 
 The `find_resource` method may raise an `ActiveRecord::RecordNotFound`
 exception. The `authorize` method may raise a

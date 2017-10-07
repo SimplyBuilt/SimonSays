@@ -9,13 +9,13 @@ class DocumentsController < ApplicationController
   find_and_authorize :document, :download, through: :memberships, only: :send_file
 
   def index
-    @documents = Document.all
+    @documents = current_user.documents
 
     respond_with @documents
   end
 
   def create
-    @document = Document.create(document_params)
+    @document = current_user.documents.create(document_params)
 
     respond_with @document
   end
