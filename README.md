@@ -12,7 +12,7 @@ Rails that works great with devise!
 
 ### Installation
 
-SimonSays can be installed via your Gemfile or using Ruby gems directly.
+SimonSays can be installed via your Gemfile.
 
 ```ruby
 gem 'simon_says'
@@ -22,21 +22,23 @@ gem 'simon_says'
 
 SimonSays consists of two parts:
 
-1. A [Roleable](#roleable) concern which provides a way to define access roles
-   on User models or on join through models.
-2. An [Authorizer](#authorizer) concern which provides a declarative API
-   to controllers for finding and authorizing model resources.
+1. A [Roleable](#roleable) module mixin which provides a way to define
+   roles on User models or on join through models.
+2. An [Authorizer](#authorizer) module mixin which provides a
+   declarative API to controllers for finding and authorizing resources.
 
 #### Roleable
 
 First, we need to define some roles on a model. Roles are stored as an
 integer and [bitmasking](https://en.wikipedia.org/wiki/Mask_(computing))
-is used to determine the roles assigned for that model. SimonSays
+is used to determine the roles assigned for given record. SimonSays
 provides a generator for creating a new migration for this required
 attribute:
 
 ```bash
+rails g model User # if and only if this model does not yet exist
 rails g active_record:simon_says User
+rails db:migrate
 ```
 
 Now we can define some roles in our User model. For example:
@@ -51,14 +53,16 @@ end
 # > User.new.roles
 # => []
 
-# > u = User.new(roles: %i[add edit])
-#
+# > u = User.create(roles: %i[add edit])
+# => #<User ...>
 # > u.roles
 # => [:add, :edit]
 # > u.has_add?
 # => true
 # > u.has_delete?
 # => false
+# > u.update roles: %i[delete add edit]
+# > u.save # save record with roles_mask of 7
 ```
 
 The attribute name can be customized by using the `:as` option as seen
@@ -107,8 +111,8 @@ end
 have a given set roles. Using the default attribute name, the two scopes
 generated would be `with_roles` and `with_all_roles`. Both methods
 accept one or more role symbols as its arguments. The first scope,
-`with_roles`, will find any model with one or more the supplied roles.
-The second scope, `with_all_roles` will only find models that have all
+`with_roles`, will find any record with one or more the supplied roles.
+The second scope, `with_all_roles` will only find record that have all
 of the supplied roles.
 
 It is useful to note the various dynamically generated methods as well
