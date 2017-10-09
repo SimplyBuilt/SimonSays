@@ -103,11 +103,20 @@ end
 # => [:download, :edit, :delete]
 ```
 
-It is useful to note the dynamically generated `has_` methods as shown
-in the User model as well the `ROLES` constant which is used in the
-Permission example. Take a look at the `Roleable`
+`Roleable` also creates two scopes that can be used to find records that
+have a given set roles. Using the default attribute name, the two scopes
+generated would be `with_roles` and `with_all_roles`. Both methods
+accept one or more role symbols as its arguments. The first scope,
+`with_roles`, will find any model with one or more the supplied roles.
+The second scope, `with_all_roles` will only find models that have all
+of the supplied roles.
+
+It is useful to note the various dynamically generated methods as well
+the `ROLES` constant, which is used in the Permission example. Take a
+look at the `Roleable`
 [source code](https://github.com/SimplyBuilt/SimonSays/blob/master/lib/simon_says/roleable.rb)
-to see how features are dynamically generated with `has_roles`.
+to see how methods and scopes are dynamically generated with
+`has_roles`.
 
 #### Authorizer
 

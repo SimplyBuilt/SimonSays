@@ -71,11 +71,11 @@ module SimonSays
             args.compact!
             args.map!(&:to_sym)
 
-            self[:#{name}_mask] = (args & #{const}).map { |i| 2 ** #{const}.index(i) }.sum
+            self.#{name}_mask = (args & #{const}).map { |i| 2 ** #{const}.index(i) }.sum
           end
 
           def #{name}
-            #{const}.reject { |i| ((#{name}_mask || 0) & 2 ** #{const}.index(i)).zero? }
+            #{const}.reject { |i| ((#{name}_mask || 0) & 2 ** #{const}.index(i)).zero? }.tap(&:freeze)
           end
 
           def has_#{name}?(*args)
