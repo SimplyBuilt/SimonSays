@@ -93,12 +93,35 @@ module SimonSays
           RUBY_EVAL
         end
 
-        # Declare a scope for finding records with a given role set
-        # TODO support an array roles (must match ALL)
-        scope "with_#{name}", ->(role) {
-          where("(#{name}_mask & ?) > 0", 2**roles.index(role.to_sym))
+        # Declare scopes for finding records with a given set of roles
+
+        scope "with_#{name}", ->(*args) {
+          clause = "#{name}_mask & ?"
+          values = Roleable.roles2ints(roles, *args)
+
+          query = where(clause, values.shift)
+          query = query.or(where(clause, values.shift)) until values.empty?
+          query
+        }
+
+        scope "with_all_#{name}", ->(*args) {
+          clause = "#{name}_mask & ?"
+          values = Roleable.roles2ints(roles, *args)
+
+          query = where(clause, values.shift)
+          query = query.where(clause, values.shift) until values.empty?
+          query
         }
       end
+    end
+
+    def self.roles2ints(defined_roles, *args)
+      values = args.map do |arg|
+        index = defined_roles.index(arg)
+        index ? 2 ** index : nil
+      end
+
+      values.tap(&:flatten!)
     end
   end
 end
