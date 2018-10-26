@@ -71,11 +71,11 @@ module SimonSays
             args.compact!
             args.map!(&:to_sym)
 
-            self[:#{name}_mask] = (args & #{const}).map { |i| 2 ** #{const}.index(i) }.sum
+            self.#{name}_mask = (args & #{const}).map { |i| 2 ** #{const}.index(i) }.sum
           end
 
           def #{name}
-            #{const}.reject { |i| ((#{name}_mask || 0) & 2 ** #{const}.index(i)).zero? }
+            #{const}.reject { |i| ((#{name}_mask || 0) & 2 ** #{const}.index(i)).zero? }.tap(&:freeze)
           end
 
           def has_#{name}?(*args)
@@ -93,12 +93,40 @@ module SimonSays
           RUBY_EVAL
         end
 
-        # Declare a scope for finding records with a given role set
-        # TODO support an array roles (must match ALL)
-        scope "with_#{name}", ->(role) {
-          where("(#{name}_mask & ?) > 0", 2**roles.index(role.to_sym))
-        }
+        # Try to declare ActiveRecord scopes or Sequel subsets for finding
+        # records with a given set of roles
+
+        scope_method = respond_to?(:scope) ? :scope : respond_to?(:subset) ? :subset : nil
+
+        if scope_method
+          send scope_method, "with_#{name}", ->(*args) {
+            clause = "#{name}_mask & ?"
+            values = Roleable.roles2ints(roles, *args)
+
+            query = where(clause, values.shift)
+            query = query.or(where(clause, values.shift)) until values.empty?
+            query
+          }
+
+          send scope_method, "with_all_#{name}", ->(*args) {
+            clause = "#{name}_mask & ?"
+            values = Roleable.roles2ints(roles, *args)
+
+            query = where(clause, values.shift)
+            query = query.where(clause, values.shift) until values.empty?
+            query
+          }
+        end
       end
+    end
+
+    def self.roles2ints(defined_roles, *args)
+      values = args.map do |arg|
+        index = defined_roles.index(arg)
+        index ? 2 ** index : nil
+      end
+
+      values.tap(&:flatten!)
     end
   end
 end
