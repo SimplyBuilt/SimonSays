@@ -93,25 +93,30 @@ module SimonSays
           RUBY_EVAL
         end
 
-        # Declare scopes for finding records with a given set of roles
+        # Try to declare ActiveRecord scopes or Sequel subsets for finding
+        # records with a given set of roles
 
-        scope "with_#{name}", ->(*args) {
-          clause = "#{name}_mask & ?"
-          values = Roleable.roles2ints(roles, *args)
+        scope_method = respond_to?(:scope) ? :scope : respond_to?(:subset) ? :subset : nil
 
-          query = where(clause, values.shift)
-          query = query.or(where(clause, values.shift)) until values.empty?
-          query
-        }
+        if scope_method
+          send scope_method, "with_#{name}", ->(*args) {
+            clause = "#{name}_mask & ?"
+            values = Roleable.roles2ints(roles, *args)
 
-        scope "with_all_#{name}", ->(*args) {
-          clause = "#{name}_mask & ?"
-          values = Roleable.roles2ints(roles, *args)
+            query = where(clause, values.shift)
+            query = query.or(where(clause, values.shift)) until values.empty?
+            query
+          }
 
-          query = where(clause, values.shift)
-          query = query.where(clause, values.shift) until values.empty?
-          query
-        }
+          send scope_method, "with_all_#{name}", ->(*args) {
+            clause = "#{name}_mask & ?"
+            values = Roleable.roles2ints(roles, *args)
+
+            query = where(clause, values.shift)
+            query = query.where(clause, values.shift) until values.empty?
+            query
+          }
+        end
       end
     end
 
