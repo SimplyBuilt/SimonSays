@@ -1,4 +1,5 @@
-require 'mocha/mini_test'
+require 'minitest/unit'
+require 'mocha/minitest'
 
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 require 'simon_says' # HELLO SIMON

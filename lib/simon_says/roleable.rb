@@ -124,7 +124,7 @@ module SimonSays
 
     def self.define_orm_scope(model, name, &block)
       if defined? ActiveRecord
-        model.scope name, &block
+        model.scope name, block
       elsif defined? Sequel
         model.dataset_module { subset name, &block }
       end

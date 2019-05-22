@@ -2,7 +2,8 @@ language: ruby
 cache: bundler
 install: bundle install --jobs=3 --retry=3
 rvm:
-  - "2.3.3"
-  - "2.4.0"
+  - "2.6.3"
+  - "2.5.4"
+  - "2.4.6"
 script:
   - bundle exec rake test
