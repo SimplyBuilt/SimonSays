@@ -132,15 +132,34 @@ class RoleableTest < ActiveSupport::TestCase
   test "named scope with_roles" do
     assert_equal [2, 1], [
       Membership.with_roles(:download).count,
-      Membership.with_roles(:delete).count
+      Membership.with_roles(:edit, :delete).count,
     ]
   end
 
   test "named scope with_access" do
-    assert_equal [2, 2, 2], [
-      Admin.with_access(:marketing).count,
+    assert_equal [2, 3, 4], [
       Admin.with_access(:content).count,
-      Admin.with_access(:support).count
+      Admin.with_access(:content, :marketing).count,
+      Admin.with_access(:content, :marketing, :support).count
+    ]
+  end
+
+  test "named scope with_all_roles" do
+    memberships(:mb1).update roles: %i[download fork edit]
+    memberships(:mb2).update roles: %i[download fork]
+
+    assert_equal [2, 0], [
+      Membership.with_all_roles(:download, :fork).count,
+      Membership.with_all_roles(:download, :fork, :edit, :delete).count
+    ]
+  end
+
+  test "named scope with_all_access" do
+    Admin.create(access: %i[content marketing])
+
+    assert_equal [2, 1], [
+      Admin.with_all_access(:content, :marketing).count,
+      Admin.with_all_access(:content, :marketing, :support).count
     ]
   end
 
