@@ -93,40 +93,41 @@ module SimonSays
           RUBY_EVAL
         end
 
-        # Try to declare ActiveRecord scopes or Sequel subsets for finding
-        # records with a given set of roles
+        Roleable.define_orm_scope self, "with_#{name}" do |*args|
+          clause = "#{name}_mask & ?"
+          values = Roleable.cast_roles_to_ints(roles, *args)
 
-        scope_method = respond_to?(:scope) ? :scope : respond_to?(:subset) ? :subset : nil
+          query = where(clause, values.shift)
+          query = query.or(where(clause, values.shift)) until values.empty?
+          query
+        end
 
-        if scope_method
-          send scope_method, "with_#{name}", ->(*args) {
-            clause = "#{name}_mask & ?"
-            values = Roleable.roles2ints(roles, *args)
+        Roleable.define_orm_scope self, "with_all_#{name}" do |*args|
+          clause = "#{name}_mask & ?"
+          values = Roleable.cast_roles_to_ints(roles, *args)
 
-            query = where(clause, values.shift)
-            query = query.or(where(clause, values.shift)) until values.empty?
-            query
-          }
-
-          send scope_method, "with_all_#{name}", ->(*args) {
-            clause = "#{name}_mask & ?"
-            values = Roleable.roles2ints(roles, *args)
-
-            query = where(clause, values.shift)
-            query = query.where(clause, values.shift) until values.empty?
-            query
-          }
+          query = where(clause, values.shift)
+          query = query.where(clause, values.shift) until values.empty?
+          query
         end
       end
     end
 
-    def self.roles2ints(defined_roles, *args)
+    def self.cast_roles_to_ints(defined_roles, *args)
       values = args.map do |arg|
         index = defined_roles.index(arg)
         index ? 2 ** index : nil
       end
 
       values.tap(&:flatten!)
+    end
+
+    def self.define_orm_scope(model, name, &block)
+      if defined? ActiveRecord
+        model.scope name, &block
+      elsif defined? Sequel
+        model.dataset_module { subset name, &block }
+      end
     end
   end
 end
