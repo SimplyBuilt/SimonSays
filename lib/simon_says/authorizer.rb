@@ -177,7 +177,7 @@ module SimonSays
     # @private
     def resource_scope_and_query(resource, options)
       if options[:through]
-        field = "#{resource}_id"
+        field = :"#{resource}_id"
 
         query = { field => params[field] } if params[field]
         scope = send(self.class.default_authorization_scope)
