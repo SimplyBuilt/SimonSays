@@ -1,7 +1,9 @@
 class Admin::ReportsController < ApplicationController
   respond_to :json
 
-  authorize_resource :admin, :support
+  self.default_authorization_scope = :current_admin
+
+  authorize :support
   find_resource :report, namespace: :admin, except: [:index, :new, :create]
 
   def index

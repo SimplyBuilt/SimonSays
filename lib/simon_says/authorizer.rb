@@ -42,7 +42,10 @@ module SimonSays
       #   default, +:id+ is used
       # @param opts [Symbol] :param_key params key for resource query; by default,
       #   +:id+ is used
-      # @param opts [Symbol] :through through model to use when finding resource
+      # @param opts [Symbol] :through through model to use when finding and
+      #   authorizing the resource. Mutually exclusive with the :with option.
+      # @param opts [Symbol] :with what resource to authorize with. Mutually
+      #   exclusive with the :through option.
       # @param opts [Symbol] :namespace resource namespace
       #
       # @see #find_resource for finder option examples
@@ -88,20 +91,35 @@ module SimonSays
         end
       end
 
-      # Authorize against a given resource
+      # Authorize against a given resource. This resource should be an instance
+      # that includes Roleable.
       #
       # @param [Symbol, String] resource name of resource to find
       # @param [Array<Symbol, String>] roles one or more role symbols or strings
       # @param [Hash] opts before_action options
       #
       # @example Authorize resource
-      #   authorize_resource :admin, :support
-      def authorize_resource(resource, *roles)
+      #   authorize_with :admin, :support
+      def authorize_with(resource, *roles)
         opts = roles.extract_options!
 
         before_action action_options(opts) do
-          authorize roles, { resource: resource }
+          authorize roles, { with: resource }
         end
+      end
+
+      # Authorize with the +default_authorization_scope+. The instance returned
+      # by the +default_authorization_scope+ should include Roleable.
+      #
+      # @param [Array<Symbol, String>] roles one or more role symbols or strings
+      # @param [Hash] opts before_action options
+      #
+      # @example Authorize "content" and "marketing" using the current Admin
+      #   self.default_authorization_scope = :current_admin
+      #
+      #   authorize :content, :marketing
+      def authorize(*roles)
+        authorize_with(default_authorization_scope, *roles)
       end
 
       # Extract before_action options from Hash
@@ -146,10 +164,15 @@ module SimonSays
     # @param [Symbol, String] one or more required roles
     # @param [Hash] options authorizer options
     def authorize(required = nil, options)
-      if through = options[:through]
-        name = through.to_s.singularize.to_sym
+      if options.key? :through
+        name = options[:through].to_s.singularize.to_sym
+      elsif options.key? :with
+        name = options[:with].to_s.singularize.to_sym
       else
-        name = options[:resource]
+        raise ArgumentError, 'find_and_authorize must be called with either '\
+          ':through or :with option. The resource referenced by the value '\
+          'of this option should be an instance of a class that includes '\
+          'Roleable.'
       end
 
       record = instance_variable_get("@#{name}")

@@ -115,19 +115,19 @@ class AuthorizerTest < ActiveSupport::TestCase
   test "authorize with membership role" do
     @controller.instance_variable_set :@membership, documents(:alpha).memberships.first
 
-    assert @controller.authorize(:fork, resource: :membership)
+    assert @controller.authorize(:fork, with: :membership)
   end
 
   test "authorize with current_admin" do
     @controller.current_admin = admins(:support)
 
-    assert @controller.authorize(:support, resource: :admin)
+    assert @controller.authorize(:support, with: :admin)
   end
 
   test "authorize with multiple roles" do
     @controller.instance_variable_set :@membership, documents(:alpha).memberships.first
 
-    assert @controller.authorize([:update, :delete], resource: :membership)
+    assert @controller.authorize([:update, :delete], with: :membership)
   end
 
   test "authorize with through" do
@@ -140,14 +140,14 @@ class AuthorizerTest < ActiveSupport::TestCase
     @controller.current_admin = admins(:marketing)
 
     @controller.expects(:authenticate_admin!).once
-    @controller.authorize(:marketing, resource: :admin)
+    @controller.authorize(:marketing, with: :admin)
   end
 
   test "authorization failure single role" do
     assert_raises SimonSays::Authorizer::Denied do
       @controller.instance_variable_set :@membership, documents(:beta).memberships.first
 
-      @controller.authorize(:delete, resource: :membership)
+      @controller.authorize(:delete, with: :membership)
     end
   end
 
@@ -155,7 +155,7 @@ class AuthorizerTest < ActiveSupport::TestCase
     @controller.instance_variable_set :@membership, documents(:beta).memberships.first
 
     assert_raises SimonSays::Authorizer::Denied do
-      @controller.authorize([:update, :delete], resource: :membership)
+      @controller.authorize([:update, :delete], with: :membership)
     end
   end
 
