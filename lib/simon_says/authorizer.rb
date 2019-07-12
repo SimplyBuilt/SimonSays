@@ -12,6 +12,7 @@ module SimonSays
 
     included do
       class_attribute :default_authorization_scope
+      class_attribute :default_find_attribute
     end
 
     module ClassMethods
@@ -191,7 +192,10 @@ module SimonSays
         scope = klass.classify.constantize
       end
 
-      field ||= options.fetch(:find_attribute, :id)
+      field ||= options.fetch(:find_attribute) do
+        self.class.default_find_attribute&.call(resource) || :id
+      end
+
       query ||= { field => params[options.fetch(:param_key, :id)] }
 
       return scope, query

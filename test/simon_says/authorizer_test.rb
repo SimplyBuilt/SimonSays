@@ -29,6 +29,25 @@ class AuthorizerTest < ActiveSupport::TestCase
     @controller.params = { id: documents(:alpha).id }
   end
 
+  def with_params(params)
+    default_params = @controller.params
+    @controller.params = params
+
+    yield
+
+  ensure
+    @controller.params = default_params
+  end
+
+  def with_default_find_attribute(callalbe)
+    @controller.class.default_find_attribute = callalbe
+
+    yield
+
+  ensure
+    @controller.class.default_find_attribute = nil
+  end
+
   test "find_resource" do
     @controller.find_resource :document
 
@@ -139,5 +158,14 @@ class AuthorizerTest < ActiveSupport::TestCase
       @controller.authorize([:update, :delete], resource: :membership)
     end
   end
-end
 
+  test 'Authorizer.default_find_attribute proc' do
+    with_default_find_attribute ->(resource) { :"#{resource}_id" } do
+      with_params id: clients(:alice).client_id do
+        @controller.find_resource :client
+      end
+    end
+
+    assert_equal clients(:alice), @controller[:client]
+  end
+end

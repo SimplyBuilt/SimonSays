@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160823220959) do
+ActiveRecord::Schema.define(version: 20190711184853) do
 
   create_table "admin_reports", force: :cascade do |t|
     t.string "title"
@@ -20,6 +20,11 @@ ActiveRecord::Schema.define(version: 20160823220959) do
 
   create_table "admins", force: :cascade do |t|
     t.integer "access_mask"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "clients", primary_key: "client_id", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
