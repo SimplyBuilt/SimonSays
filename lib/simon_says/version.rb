@@ -1,3 +1,3 @@
 module SimonSays
-  VERSION = '0.3.0.alpha.4'
+  VERSION = '0.3.0.alpha.5'
 end
