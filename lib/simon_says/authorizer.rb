@@ -6,7 +6,9 @@ module SimonSays
       # @private
       def initialize(as, required, actual)
         # TODO i18n for err message (as should be singluarized with 1 flag)
-        super "Access denied; #{required * ', '} role is required. Current access is #{actual * ', '}"
+        current_access = actual.empty? ? 'empty' : actual.join(', ')
+
+        super "Access denied; #{required * ', '} #{as} is required. Current access is #{current_access}"
       end
     end
 
@@ -145,7 +147,8 @@ module SimonSays
       scope, query = resource_scope_and_query(resource, options)
       through = options[:through] ? options[:through].to_s : nil
 
-      assoc = through || (options[:from] ? resource.pluralize : nil)
+      assoc_name = through || (options[:from] ? resource.pluralize : nil)
+      assoc = Authorizer.association_method(assoc_name)
       scope = scope.send(assoc) if assoc && scope.respond_to?(assoc)
 
       record = scope.where(query).first!
@@ -193,6 +196,13 @@ module SimonSays
       ((required & actual).size > 0).tap do |res|
         raise Denied.new(role_attr, required, actual) unless res
       end
+    end
+
+    def self.association_method(assoc)
+      return if assoc.nil?
+      return :"#{assoc}_dataset" if defined? Sequel
+
+      assoc.to_sym
     end
 
     private
