@@ -1,0 +1,16 @@
+en:
+  simon_says:
+    denied:
+      warning: Access denied;
+      array_connector:
+        two_words_connector: ' or '
+        last_word_connector: ', or '
+
+      required:
+        one: '%{list} is required'
+        other: '%{list} are required'
+
+      explanation:
+        zero: '%{warning} %{required}, however you have no %{role_attr} set'
+        one: '%{warning} %{required}, however you have %{actual} %{role_attr} set'
+        other: '%{warning} %{required}, however you have %{actual} %{role_attr} set'

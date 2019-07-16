@@ -3,12 +3,30 @@ module SimonSays
     extend ActiveSupport::Concern
 
     class Denied < StandardError
-      # @private
-      def initialize(as, required, actual)
-        # TODO i18n for err message (as should be singluarized with 1 flag)
-        current_access = actual.empty? ? 'empty' : actual.join(', ')
+      attr_reader :role_attr
 
-        super "Access denied; #{required * ', '} #{as} is required. Current access is #{current_access}"
+      # @private
+      def initialize(role_attr, required, actual)
+        @role_attr = role_attr
+
+        if defined? I18n
+          required_text = I18n.translate(
+            'simon_says.denied.required',
+            count: required.size,
+            list: required.to_sentence(I18n.translate('simon_says.denied.array_connector'))
+          )
+
+          super I18n.translate(
+            'simon_says.denied.explanation',
+            count: actual.size,
+            role_attr: @role_attr,
+            warning: I18n.translate('simon_says.denied.warning'),
+            actual: actual.to_sentence,
+            required: required_text
+          )
+        else
+          super "Access denied; required=#{required.inspect} current_access=#{actual.inspect}"
+        end
       end
     end
 
